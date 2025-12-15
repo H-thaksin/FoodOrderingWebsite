@@ -3,7 +3,6 @@
 @section('content')
 
 <!-- HERO SECTION -->
-
 <section class="hero-fullscreen">
     <div class="hero-inner text-center">
         <h1>Savor the Magic of Authentic Khmer Flavors</h1>
@@ -14,6 +13,48 @@
         @guest
         <a href="{{ route('register') }}" class="btn btn-outline-modern">Sign Up</a>
         @endguest
+    </div>
+</section>
+
+<!-- ABOUT US SECTION -->
+<section id="about-us" class="container my-5 py-5 text-center">
+    <h2 class="fw-bold mb-4">About Us</h2>
+    <p class="mb-3 fs-5">
+        Welcome to <strong>Apsara Flavors</strong>! We bring you the authentic taste of Khmer cuisine,
+        crafted with love and the freshest ingredients. Taste the heart of Cambodia in every bite.
+    </p>
+    <p class="mb-4 fs-5">
+        Our mission is to deliver quality, freshness, and a true Cambodian flavor experience to our customers.
+    </p>
+
+    <div class="row justify-content-center mt-4 g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 team-card">
+                <img src="{{ asset('images/about/team1.jpg') }}" class="card-img-top rounded-4" alt="Sokha Chhay">
+                <div class="card-body">
+                    <h5 class="fw-bold">Hun Sen</h5>
+                    <p class="text-muted">Founder & CEO</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 team-card">
+                <img src="{{ asset('images/about/team2.jpg') }}" class="card-img-top rounded-4" alt="Vannak Dara">
+                <div class="card-body">
+                    <h5 class="fw-bold">Sam Rainsy</h5>
+                    <p class="text-muted">Head Chef</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 team-card">
+                <img src="{{ asset('images/about/team3.jpg') }}" class="card-img-top rounded-4" alt="Anutin Charnvirakul">
+                <div class="card-body">
+                    <h5 class="fw-bold">Anutin Charnvirakul</h5>
+                    <p class="text-muted">Restaurant Manager</p>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -46,16 +87,13 @@
 
                 @if($food->image)
                 <div class="food-img-container">
-                    <img src="{{ asset('storage/foods/'.$food->image) }}" class="food-img rounded-top-4">
+                    <img src="{{ asset('storage/foods/'.$food->image) }}" class="food-img rounded-top-4" alt="{{ $food->name }}">
                 </div>
                 @endif
 
                 <div class="card-body text-center">
                     <h5 class="fw-bold">{{ $food->name }}</h5>
-
-                    <p class="text-pink fw-semibold fs-5 mb-2">
-                        ${{ number_format($food->price, 2) }}
-                    </p>
+                    <p class="text-pink fw-semibold fs-5 mb-2">${{ number_format($food->price, 2) }}</p>
 
                     <div class="d-flex justify-content-center mb-3">
                         <input type="number" 
@@ -68,7 +106,6 @@
                     <button class="btn btn-pink rounded-pill add-to-cart-btn px-4" data-id="{{ $food->id }}">
                         <i class="bi bi-cart-plus"></i> Add to Cart
                     </button>
-
                 </div>
 
             </div>
@@ -94,6 +131,7 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Add to cart functionality
     const buttons = document.querySelectorAll('.add-to-cart-btn');
     const cartCountEl = document.getElementById('cartCount');
 
@@ -121,6 +159,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         showConfirmButton: false
                     });
                 }
+            });
+        });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
             });
         });
     });

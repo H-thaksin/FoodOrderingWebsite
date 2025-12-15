@@ -2,14 +2,28 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    HomeController, AuthController, MenuController, CartController, OrderController,
-    AdminController, AdminCategoryController, AdminFoodController, AdminOrderController
+    HomeController,
+    AuthController,
+    MenuController,
+    CartController,
+    OrderController,
+    AdminController,
+    AdminCategoryController,
+    AdminFoodController,
+    AdminOrderController
 };
 
 // -------------------------
 // Home
 // -------------------------
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// -------------------------
+// About Us
+// -------------------------
+Route::get('/about-us', function () {
+    return view('about_us.about_us'); // folder.file
+})->name('about-us');
 
 // -------------------------
 // Authentication
@@ -57,9 +71,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('orders', OrderController::class)->only(['index', 'show']);
 
     // Order Tracking
-    Route::get('/orders/{order}/track', [OrderController::class, 'track'])
-        ->name('orders.track');
-     Route::post('/orders/{order}/review', [OrderController::class, 'review'])->name('orders.review');
+    Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
+    Route::post('/orders/{order}/review', [OrderController::class, 'review'])->name('orders.review');
 });
 
 // -------------------------
@@ -79,7 +92,6 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
     Route::post('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.status');
     Route::delete('orders/{order}', [AdminOrderController::class, 'destroy'])->name('admin.orders.destroy');
-    Route::get('orders/{order}/track', [AdminOrderController::class, 'track'])
-        ->name('admin.orders.track');
+    Route::get('orders/{order}/track', [AdminOrderController::class, 'track'])->name('admin.orders.track');
 
 });

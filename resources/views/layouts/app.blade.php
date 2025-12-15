@@ -46,7 +46,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#about-us"><i class="bi bi-info-circle-fill"></i> About Us</a>
+                    <a class="nav-link" href="{{ route('about-us') }}">About Us</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#catalog"><i class="bi bi-menu-button-wide-fill"></i> Catalog</a>
