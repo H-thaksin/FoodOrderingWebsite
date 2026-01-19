@@ -55,7 +55,9 @@
                     <a class="nav-link" href="#gallery"><i class="bi bi-images"></i> Gallery</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#location"><i class="bi bi-geo-alt-fill"></i> Location</a>
+                    <a class="nav-link" href="{{ route('location') }}">
+                        <i class="bi bi-geo-alt-fill"></i> Location
+                    </a>
                 </li>
             </ul>
 

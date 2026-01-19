@@ -60,6 +60,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
+                     <th>Image</th>
                     <th>Food</th>
                     <th>Unit Price</th>
                     <th>Qty</th>
@@ -71,11 +72,21 @@
                 @foreach($order->items as $item)
                     @php $itemsTotal += $item->unit_price * $item->quantity; @endphp
                     <tr>
-                        <td>{{ $item->food_name }}</td>
-                        <td>${{ number_format($item->unit_price, 2) }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>${{ number_format($item->unit_price * $item->quantity, 2) }}</td>
-                    </tr>
+    <td class="text-center">
+        <img
+            src="{{ $item->food_image
+                ? Storage::url('foods/' . $item->food_image)
+                : asset('images/no-image.png') }}"
+            style="width:50px;height:50px;object-fit:cover;"
+            class="rounded"
+        >
+    </td>
+    <td>{{ $item->food_name }}</td>
+    <td>${{ number_format($item->unit_price, 2) }}</td>
+    <td>{{ $item->quantity }}</td>
+    <td>${{ number_format($item->unit_price * $item->quantity, 2) }}</td>
+</tr>
+
                 @endforeach
                 <tr>
                     <td colspan="3" class="text-end"><strong>Items Total:</strong></td>

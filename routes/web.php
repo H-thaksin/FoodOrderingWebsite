@@ -95,3 +95,6 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::get('orders/{order}/track', [AdminOrderController::class, 'track'])->name('admin.orders.track');
 
 });
+    Route::get('/location', function () {
+    return view('location.location'); // include the folder name
+})->name('location');
