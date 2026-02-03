@@ -3,78 +3,45 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\MenuItem;
-use App\Models\Order;
-use App\Models\OrderItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'items' => ['required','array','min:1'],
-            'items.*.menu_item_id' => ['required','integer','exists:menu_items,id'],
-            'items.*.qty' => ['required','integer','min:1'],
-            'delivery_address' => ['required','string','max:500'],
-            'note' => ['nullable','string','max:500'],
-        ]);
-
-        $user = $request->user();
-
-        return DB::transaction(function () use ($data, $user) {
-            $menuItemIds = collect($data['items'])->pluck('menu_item_id')->unique();
-            $menuItems = order::whereIn('id', $menuItemIds)->get()->keyBy('id');
-
-            $total = 0;
-            foreach ($data['items'] as $line) {
-                $item = $menuItems[$line['menu_item_id']];
-                $total += ($item->price * $line['qty']);
-            }
-
-            $order = Order::create([
-                'user_id' => $user->id,
-                'delivery_address' => $data['delivery_address'],
-                'note' => $data['note'] ?? null,
-                'total_price' => $total,
-                'status' => 'pending',
-            ]);
-
-            foreach ($data['items'] as $line) {
-                $item = $menuItems[$line['menu_item_id']];
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'menu_item_id' => $item->id,
-                    'qty' => $line['qty'],
-                    'unit_price' => $item->price,
-                    'line_total' => $item->price * $line['qty'],
-                ]);
-            }
-
-            return response()->json([
-                'message' => 'Order created',
-                'data' => $order->load('items.menuItem'),
-            ], 201);
-        });
-    }
-
+    // -------------------------
+    // User Orders (requires auth)
+    // -------------------------
     public function index(Request $request)
     {
         $orders = Order::where('user_id', $request->user()->id)
-            ->latest()
-            ->with('items.menuItem')
-            ->paginate(10);
+                       ->with('items.food')
+                       ->latest()
+                       ->get();
 
-        return response()->json($orders);
+        return response()->json([
+            'status' => 'success',
+            'orders' => $orders
+        ]);
     }
 
-    public function show(Request $request, $id)
+    // -------------------------
+    // Order Details
+    // -------------------------
+    public function show(Order $order, Request $request)
     {
-        $order = Order::where('user_id', $request->user()->id)
-            ->with('items.menuItem')
-            ->findOrFail($id);
+        if ($order->user_id !== $request->user()->id) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
-        return response()->json(['data' => $order]);
+        $order->load('items.food');
+
+        return response()->json([
+            'status' => 'success',
+            'order'  => $order
+        ]);
     }
 }

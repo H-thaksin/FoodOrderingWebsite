@@ -3,74 +3,90 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    // -------------------------
+    // Register
+    // -------------------------
     public function register(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:255'],
-            'email' => ['required','email','max:255','unique:users,email'],
-            'password' => ['required','string','min:6'],
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
-        $token = $user->createToken('mobile')->plainTextToken;
+        // Create token
+        $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Registered',
-            'token' => $token,
-            'user' => $user,
+            'status' => 'success',
+            'user'   => $user,
+            'token'  => $token
         ], 201);
     }
 
+    // -------------------------
+    // Login
+    // -------------------------
     public function login(Request $request)
     {
-        $data = $request->validate([
-            'email' => ['required','email'],
-            'password' => ['required','string'],
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required'
         ]);
 
-        $user = User::where('email', $data['email'])->first();
+        $user = User::where('email', $request->email)->first();
 
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Invalid credentials'
+            ], 401);
         }
 
-
-        $token = $user->createToken('mobile')->plainTextToken;
+        $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Logged in',
-            'token' => $token,
-            'user' => $user,
+            'status' => 'success',
+            'user'   => $user,
+            'token'  => $token
         ]);
     }
 
-    public function me(Request $request)
-    {
-        return response()->json([
-            'user' => $request->user()
-        ]);
-    }
-
+    // -------------------------
+    // Logout
+    // -------------------------
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logged out'
+            'status'  => 'success',
+            'message' => 'Logged out successfully'
+        ]);
+    }
+
+    // -------------------------
+    // Profile
+    // -------------------------
+    public function profile(Request $request)
+    {
+        return response()->json([
+            'status' => 'success',
+            'user'   => $request->user()
         ]);
     }
 }
